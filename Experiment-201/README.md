@@ -64,12 +64,11 @@ The parent process should **terminate after 5 seconds**, and the child processes
 int main(void)
 {
     pid_t pid;
+    int i;
 
     printf("Parent started. PID = %d\n", getpid());
 
-    /* Create multiple children */
-    for (int i = 0; i < NUM_CHILDREN; i++) {
-
+    for (i = 0; i < NUM_CHILDREN; i++) {
         pid = fork();
 
         if (pid < 0) {
@@ -77,31 +76,33 @@ int main(void)
             exit(EXIT_FAILURE);
         }
 
-        /* Child process */
         if (pid == 0) {
+            // ---- CHILD PROCESS ----
+            printf("Child %d created. PID = %d, Parent PID = %d\n",
+                   i, getpid(), getppid());
 
-            printf("Child %d started. PID = %d, Parent PID = %d\n",
-                   i + 1, getpid(), getppid());
+            // Delay longer than parent
+            sleep(15);
 
-            /* Wait until parent terminates */
-            sleep(6);
-
-            printf("Child %d running after parent exit. My PID = %d, New Parent PID = %d\n",
-                   i + 1, getpid(), getppid());
+            printf("Child %d running AFTER parent exit\n", i);
+            printf("Child %d: My PID = %d | Parent PID = %d\n",
+                   i, getpid(), getppid());
 
             exit(EXIT_SUCCESS);
         }
 
-        /* Parent continues loop to create next child */
+        // ---- PARENT continues to create other children ----
     }
 
-    /* Parent process */
-    printf("Parent sleeping for 5 seconds...\n");
+    // ---- PARENT PROCESS ----
+    printf("Parent (PID=%d) will exit in 5 seconds...\n", getpid());
     sleep(5);
+    printf("Parent exiting now.\n");
 
-    printf("Parent exiting now. PID = %d\n", getpid());
-    exit(EXIT_SUCCESS);
+    return 0;   // Parent terminates without waiting for children
 }
+
+
 ```
 
 ---
@@ -125,6 +126,7 @@ Child 3 running after parent exit. My PID = 1203, New Parent PID = 1
 ---
 
 # Ouput
+<img width="1895" height="327" alt="image" src="https://github.com/user-attachments/assets/9abe6fd0-0b9d-4dce-97d6-a49f9892f839" />
 
 ---
 
